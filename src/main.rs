@@ -1,8 +1,8 @@
-mod snake;
 mod command;
 mod direction;
 mod game;
 mod point;
+mod snake;
 
 use crate::game::Game;
 use std::io::stdout;

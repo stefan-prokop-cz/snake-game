@@ -1,15 +1,15 @@
-use crate::snake::Snake;
-use crate::point::Point;
-use crate::direction::Direction;
-use std::io::Stdout;
-use crossterm::{ExecutableCommand};
-use crossterm::terminal::{Clear, ClearType, size, SetSize, enable_raw_mode, disable_raw_mode};
-use crossterm::style::{SetForegroundColor, Print, ResetColor, Color};
-use std::time::{Duration, Instant};
-use crossterm::cursor::{Show, MoveTo, Hide};
-use crossterm::event::{poll, read, Event, KeyCode, KeyModifiers, KeyEvent};
 use crate::command::Command;
+use crate::direction::Direction;
+use crate::point::Point;
+use crate::snake::Snake;
+use crossterm::cursor::{Hide, MoveTo, Show};
+use crossterm::event::{poll, read, Event, KeyCode, KeyEvent, KeyModifiers};
+use crossterm::style::{Color, Print, ResetColor, SetForegroundColor};
+use crossterm::terminal::{disable_raw_mode, enable_raw_mode, size, Clear, ClearType, SetSize};
+use crossterm::ExecutableCommand;
 use rand::Rng;
+use std::io::Stdout;
+use std::time::{Duration, Instant};
 
 const MAX_INTERVAL: u16 = 700;
 const MIN_INTERVAL: u16 = 200;
@@ -24,7 +24,7 @@ pub struct Game {
     food: Option<Point>,
     snake: Snake,
     speed: u16,
-    score: u16
+    score: u16,
 }
 
 impl Game {
@@ -43,11 +43,11 @@ impl Game {
                     0 => Direction::Up,
                     1 => Direction::Right,
                     2 => Direction::Down,
-                    _ => Direction::Left
-                }
+                    _ => Direction::Left,
+                },
             ),
             speed: 0,
-            score: 0
+            score: 0,
         }
     }
     pub fn run(&mut self) {
@@ -65,7 +65,7 @@ impl Game {
                         Command::Quit => {
                             done = true;
                             break;
-                        },
+                        }
                         Command::Turn(towards) => {
                             if direction != towards && direction.opposite() != towards {
                                 self.snake.set_direction(towards);
@@ -84,11 +84,7 @@ impl Game {
                         self.place_food();
                         self.score += 1;
                         let division = (self.width * self.height) / MAX_SPEED;
-                        let divisor = if division > 0 {
-                            division
-                        } else {
-                            1
-                        };
+                        let divisor = if division > 0 { division } else { 1 };
                         if self.score % divisor == 0 {
                             self.speed += 1;
                         }
@@ -114,9 +110,12 @@ impl Game {
     fn prepare_ui(&mut self) {
         enable_raw_mode().unwrap();
         self.stdout
-            .execute(SetSize(self.width + 3, self.height + 3)).unwrap()
-            .execute(Clear(ClearType::All)).unwrap()
-            .execute(Hide).unwrap();
+            .execute(SetSize(self.width + 3, self.height + 3))
+            .unwrap()
+            .execute(Clear(ClearType::All))
+            .unwrap()
+            .execute(Hide)
+            .unwrap();
     }
     fn render(&mut self) {
         self.draw_borders();
@@ -125,11 +124,15 @@ impl Game {
         self.draw_snake();
     }
     fn draw_food(&mut self) {
-        self.stdout.execute(SetForegroundColor(Color::White)).unwrap();
+        self.stdout
+            .execute(SetForegroundColor(Color::White))
+            .unwrap();
         for food in self.food.iter() {
             self.stdout
-                .execute(MoveTo(food.x + 1, food.y + 1)).unwrap()
-                .execute(Print("•")).unwrap();
+                .execute(MoveTo(food.x + 1, food.y + 1))
+                .unwrap()
+                .execute(Print("•"))
+                .unwrap();
         }
     }
     fn draw_background(&mut self) {
@@ -137,36 +140,56 @@ impl Game {
         for y in 1..self.height + 1 {
             for x in 1..self.width + 1 {
                 self.stdout
-                    .execute(MoveTo(x, y)).unwrap()
-                    .execute(Print(" ")).unwrap();
+                    .execute(MoveTo(x, y))
+                    .unwrap()
+                    .execute(Print(" "))
+                    .unwrap();
             }
         }
     }
     fn draw_borders(&mut self) {
-        self.stdout.execute(SetForegroundColor(Color::DarkGrey)).unwrap();
+        self.stdout
+            .execute(SetForegroundColor(Color::DarkGrey))
+            .unwrap();
         for y in 0..self.height + 2 {
             self.stdout
-                .execute(MoveTo(0, y)).unwrap()
-                .execute(Print("#")).unwrap()
-                .execute(MoveTo(self.width + 1, y)).unwrap()
-                .execute(Print("#")).unwrap();
+                .execute(MoveTo(0, y))
+                .unwrap()
+                .execute(Print("#"))
+                .unwrap()
+                .execute(MoveTo(self.width + 1, y))
+                .unwrap()
+                .execute(Print("#"))
+                .unwrap();
         }
         for x in 0..self.width + 2 {
             self.stdout
-                .execute(MoveTo(x, 0)).unwrap()
-                .execute(Print("#")).unwrap()
-                .execute(MoveTo(x, self.height + 1)).unwrap()
-                .execute(Print("#")).unwrap();
+                .execute(MoveTo(x, 0))
+                .unwrap()
+                .execute(Print("#"))
+                .unwrap()
+                .execute(MoveTo(x, self.height + 1))
+                .unwrap()
+                .execute(Print("#"))
+                .unwrap();
         }
         self.stdout
-            .execute(MoveTo(0, 0)).unwrap()
-            .execute(Print("#")).unwrap()
-            .execute(MoveTo(self.width + 1, self.height + 1)).unwrap()
-            .execute(Print("#")).unwrap()
-            .execute(MoveTo(self.width + 1, 0)).unwrap()
-            .execute(Print("#")).unwrap()
-            .execute(MoveTo(0, self.height + 1)).unwrap()
-            .execute(Print("#")).unwrap();
+            .execute(MoveTo(0, 0))
+            .unwrap()
+            .execute(Print("#"))
+            .unwrap()
+            .execute(MoveTo(self.width + 1, self.height + 1))
+            .unwrap()
+            .execute(Print("#"))
+            .unwrap()
+            .execute(MoveTo(self.width + 1, 0))
+            .unwrap()
+            .execute(Print("#"))
+            .unwrap()
+            .execute(MoveTo(0, self.height + 1))
+            .unwrap()
+            .execute(Print("#"))
+            .unwrap();
     }
     fn draw_snake(&mut self) {
         let fg = SetForegroundColor(match self.speed % 3 {
@@ -188,8 +211,16 @@ impl Game {
                     } else {
                         let d = body.transform(Direction::Down, 1);
                         let r = body.transform(Direction::Right, 1);
-                        let u = if body.y == 0 { body.clone() } else { body.transform(Direction::Up, 1) };
-                        let l = if body.x == 0 { body.clone() } else { body.transform(Direction::Left, 1) };
+                        let u = if body.y == 0 {
+                            body.clone()
+                        } else {
+                            body.transform(Direction::Up, 1)
+                        };
+                        let l = if body.x == 0 {
+                            body.clone()
+                        } else {
+                            body.transform(Direction::Left, 1)
+                        };
                         if (next == d && prev == r) || (prev == d && next == r) {
                             '╔'
                         } else if (next == d && prev == l) || (prev == d && next == l) {
@@ -213,37 +244,41 @@ impl Game {
                 panic!("Invalid snake body point!");
             };
             self.stdout
-                .execute(MoveTo(body.x + 1, body.y + 1)).unwrap()
-                .execute(Print(symbol)).unwrap();
+                .execute(MoveTo(body.x + 1, body.y + 1))
+                .unwrap()
+                .execute(Print(symbol))
+                .unwrap();
         }
     }
     fn calculate_interval(&self) -> Duration {
         let speed = MAX_SPEED - self.speed;
         Duration::from_millis(
-            (MIN_INTERVAL + ((MAX_INTERVAL - MIN_INTERVAL) / MAX_SPEED) * speed) as u64
+            (MIN_INTERVAL + ((MAX_INTERVAL - MIN_INTERVAL) / MAX_SPEED) * speed) as u64,
         )
     }
     fn get_command(&self, wait_for: Duration) -> Option<Command> {
         let key_event = self.wait_for_key_event(wait_for)?;
         match key_event.code {
             KeyCode::Char('q') | KeyCode::Char('Q') | KeyCode::Esc => Some(Command::Quit),
-            KeyCode::Char('c') | KeyCode::Char('C') => if key_event.modifiers == KeyModifiers::CONTROL {
-                Some(Command::Quit)
-            } else {
-                None
+            KeyCode::Char('c') | KeyCode::Char('C') => {
+                if key_event.modifiers == KeyModifiers::CONTROL {
+                    Some(Command::Quit)
+                } else {
+                    None
+                }
             }
             KeyCode::Up => Some(Command::Turn(Direction::Up)),
             KeyCode::Right => Some(Command::Turn(Direction::Right)),
             KeyCode::Left => Some(Command::Turn(Direction::Left)),
             KeyCode::Down => Some(Command::Turn(Direction::Down)),
-            _ => None
+            _ => None,
         }
     }
     fn wait_for_key_event(&self, wait_for: Duration) -> Option<KeyEvent> {
         if poll(wait_for).ok()? {
             let event = read().ok()?;
             if let Event::Key(key_event) = event {
-                return Some(key_event)
+                return Some(key_event);
             }
         }
         None
@@ -258,7 +293,10 @@ impl Game {
         }
     }
     fn has_bitten_itself(&self) -> bool {
-        let next_head_point = self.snake.get_head_point().transform(self.snake.get_direction(), 1);
+        let next_head_point = self
+            .snake
+            .get_head_point()
+            .transform(self.snake.get_direction(), 1);
         let mut next_body_points = self.snake.get_body_points().clone();
         next_body_points.remove(next_body_points.len() - 1);
         next_body_points.remove(0);
@@ -267,10 +305,14 @@ impl Game {
     fn restore_ui(&mut self) {
         let (cols, rows) = self.original_terminal_size;
         self.stdout
-            .execute(SetSize(cols, rows)).unwrap()
-            .execute(Clear(ClearType::All)).unwrap()
-            .execute(Show).unwrap()
-            .execute(ResetColor).unwrap();
+            .execute(SetSize(cols, rows))
+            .unwrap()
+            .execute(Clear(ClearType::All))
+            .unwrap()
+            .execute(Show)
+            .unwrap()
+            .execute(ResetColor)
+            .unwrap();
         disable_raw_mode().unwrap();
     }
 }

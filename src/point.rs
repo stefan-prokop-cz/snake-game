@@ -3,7 +3,7 @@ use crate::direction::Direction;
 #[derive(Debug, Clone, PartialEq, Copy)]
 pub struct Point {
     pub x: u16,
-    pub y: u16
+    pub y: u16,
 }
 
 impl Point {
@@ -20,12 +20,15 @@ impl Point {
         };
         Self::new(
             Self::transform_value(self.x, transformation.0),
-            Self::transform_value(self.y, transformation.1)
+            Self::transform_value(self.y, transformation.1),
         )
     }
     fn transform_value(value: u16, by: i16) -> u16 {
         if by.is_negative() && by.abs() as u16 > value {
-            panic!("Transforming value {} by {} would result in a negative number", value, by)
+            panic!(
+                "Transforming value {} by {} would result in a negative number",
+                value, by
+            )
         } else {
             (value as i16 + by) as u16
         }
